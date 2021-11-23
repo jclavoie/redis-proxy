@@ -1,0 +1,76 @@
+spring:
+  application:
+    name: redis-proxy
+  profiles:
+    active: default, local  # Default profile for local development, will be override in TugFile or by other means
+  main:
+    banner-mode: off
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+server:
+  shutdown: graceful
+
+# Actuators
+management:
+  server.port: 8081
+  endpoints.web:
+    exposure.include: "*"
+  metrics:
+    enable.jvm: true
+  # Uses the telegraf sidecar port for health
+  endpoint:
+    health:
+      show-details: always
+      probes.enabled: true
+
+# /actuator/info properties
+info:
+  groupId: "@project.groupId@"
+  artifactId: "@project.artifactId@"
+  version: "@project.version@"
+  name: "@project.name@"
+  description: "@project.description@"
+
+springdoc:
+  api-docs.enabled: true
+  use-management-port: true
+  show-actuator: true
+
+---
+spring:
+  config.activate.on-profile: local
+
+application:
+
+---
+
+config.activate.on-profile: development
+
+---
+
+config.activate.on-profile: staging
+
+---
+
+config.activate.on-profile: production
+
+---
+# Actuator properties https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html
+management:
+  server.port: 8081
+  metrics:
+    enable:
+      all: false
+      jvm: true
+      http: true
+    distribution:
+      slo:
+        http:
+          server.requests: 100ms,200ms,500ms,1000ms,2000ms,3000ms,5000ms,8000ms
+          client.requests: 100ms,200ms,500ms,1000ms,2000ms,3000ms,5000ms,8000ms
+  # Uses the telegraf sidecar port for health
+  endpoint:
+    health:
+      show-details: always
+      probes.enabled: true
