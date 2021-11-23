@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  redis-proxy:
+    image: jclavoie/redis-proxy:0.0.1-SNAPSHOT
+    ports:
+      - "18080:8080"
+  redis:
+    image: "redis:alpine"
