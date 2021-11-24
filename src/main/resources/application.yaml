@@ -2,7 +2,7 @@ spring:
   application:
     name: redis-proxy
   profiles:
-    active: default, local  # Default profile for local development, will be override in TugFile or by other means
+    active: default, local
   main:
     banner-mode: off
   lifecycle:
@@ -45,6 +45,20 @@ springdoc:
 ---
 spring:
   config.activate.on-profile: local
+  redis:
+    database: 0
+    host: "127.0.0.1"
+    port: "16379"
+    timeout: 60000
+
+---
+spring:
+  config.activate.on-profile: compose
+  redis:
+    database: 0
+    host: "redis"
+    port: "6379"
+    timeout: 60000
 
 ---
 # Actuator properties https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html

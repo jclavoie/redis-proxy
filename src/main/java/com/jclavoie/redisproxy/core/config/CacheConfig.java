@@ -7,7 +7,7 @@ import com.jclavoie.redisproxy.core.RedisWrapper;
 import com.jclavoie.redisproxy.core.cache.LocalCache;
 
 @org.springframework.context.annotation.Configuration
-public class Config
+public class CacheConfig
 {
   @Bean
   public LocalCache<String, String> getLocalCache(
