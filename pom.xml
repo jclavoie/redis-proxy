@@ -14,11 +14,14 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>redis-proxy</name>
   <description>Redis Proxy</description>
+
   <properties>
     <testcontainers.version>1.16.0</testcontainers.version>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
+    <deps.guava.version>31.0.1-jre</deps.guava.version>
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -34,6 +37,14 @@
       <artifactId>lombok</artifactId>
       <optional>true</optional>
     </dependency>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${deps.guava.version}</version>
+    </dependency>
+
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
@@ -49,6 +60,8 @@
       <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
+
+
   </dependencies>
   <dependencyManagement>
     <dependencies>

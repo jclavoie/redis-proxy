@@ -6,10 +6,15 @@ spring:
   main:
     banner-mode: off
   lifecycle:
-    timeout-per-shutdown-phase: 30s
+    timeout-per-shutdown-phase: 5s
 
 server:
   shutdown: graceful
+
+application:
+  redis-proxy:
+    cache.size: 50
+    cache.ttl_second: 60
 
 # Actuators
 management:
@@ -40,20 +45,6 @@ springdoc:
 ---
 spring:
   config.activate.on-profile: local
-
-application:
-
----
-
-config.activate.on-profile: development
-
----
-
-config.activate.on-profile: staging
-
----
-
-config.activate.on-profile: production
 
 ---
 # Actuator properties https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html
