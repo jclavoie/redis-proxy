@@ -9,7 +9,7 @@ public class LocalCacheTest
   @Test
   public void put_exceededLimit_oldestEvicted()
   {
-    final var cache = new LocalCache<Integer, Integer>(5);
+    final var cache = new LocalCache<Integer, Integer>(5, 10);
     cache.put(1, 1);
     cache.put(2, 2);
     cache.put(3, 3);

@@ -10,7 +10,7 @@ public class LocalCache<K, V>
 {
   private final Map<K, V> cache;
 
-  public LocalCache(final int capacity)
+  public LocalCache(final int capacity, final int ttlSecond)
   {
     cache = new LRUCache(capacity);
   }

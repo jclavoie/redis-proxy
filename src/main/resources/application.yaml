@@ -42,6 +42,8 @@ spring:
   config.activate.on-profile: local
 
 application:
+  config.redis-proxy.cache:size: 50
+  config.redis-proxy.cache:ttl_second: 60
 
 ---
 
