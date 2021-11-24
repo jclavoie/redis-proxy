@@ -1,8 +1,6 @@
 package com.jclavoie.redisproxy.core;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.google.common.cache.Cache;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -10,24 +8,29 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class LocalCache
 {
-  @Autowired
-  private Cache<String, String> cache;
+  private final Map<String, String> cache;
+
+  public LocalCache(final int capacity)
+  {
+    cache = new LRUCache(capacity);
+  }
 
   public Mono<String> get(final String key)
   {
-    final var value = cache.getIfPresent(key);
+    final var value = cache.get(key);
     if (value != null)
     {
       log.info("Fetched value for key {} in Local Cache", key);
+      return Mono.just(value);
     }
     else
     {
-      log.info("Local Cache missed for key {}", key);
+      return Mono.empty();
     }
-    return Mono.justOrEmpty(value);
   }
 
-  public void put(final String key, final String value)
+  /* TODO : Make it non blocking */
+  public synchronized void put(final String key, final String value)
   {
     cache.put(key, value);
   }

@@ -2,9 +2,13 @@ package com.jclavoie.redisproxy.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jclavoie.redisproxy.core.ProxyService;
+
+import reactor.core.publisher.Mono;
 
 @CrossOrigin
 @RestController
@@ -12,4 +16,11 @@ public class ProxyController
 {
   @Autowired
   private ProxyService proxyService;
+
+  @GetMapping(
+      value = "{key}")
+  public Mono<String> getValue(@PathVariable("key") final String key)
+  {
+    return proxyService.get(key);
+  }
 }
