@@ -6,6 +6,6 @@ public class RedisWrapper
 {
   public Mono<String> get(final String key)
   {
-    return Mono.just("No Implemented");
+    return Mono.just("Not Implemented");
   }
 }

@@ -11,8 +11,8 @@ public class Config
 {
   @Bean
   public LocalCache<String, String> getLocalCache(
-      @Value("${application.config.redis-proxy.cache.size}") final int cacheSize,
-      @Value("${application.config.redis-proxy.cache.ttlSecond}") final int ttlSecond)
+      @Value("${application.redis-proxy.cache.size}") final int cacheSize,
+      @Value("${application.redis-proxy.cache.ttl_second}") final int ttlSecond)
   {
     return new LocalCache<>(cacheSize, ttlSecond);
   }
