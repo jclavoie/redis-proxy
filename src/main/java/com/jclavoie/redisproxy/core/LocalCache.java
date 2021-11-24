@@ -6,16 +6,16 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Slf4j
-public class LocalCache
+public class LocalCache<K, V>
 {
-  private final Map<String, String> cache;
+  private final Map<K, V> cache;
 
   public LocalCache(final int capacity)
   {
     cache = new LRUCache(capacity);
   }
 
-  public Mono<String> get(final String key)
+  public Mono<V> get(final K key)
   {
     final var value = cache.get(key);
     if (value != null)
@@ -30,7 +30,7 @@ public class LocalCache
   }
 
   /* TODO : Make it non blocking */
-  public synchronized void put(final String key, final String value)
+  public synchronized void put(final K key, final V value)
   {
     cache.put(key, value);
   }

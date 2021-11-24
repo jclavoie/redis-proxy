@@ -6,19 +6,25 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
-@Component
 @Slf4j
+@Component
 public class ProxyService
 {
+  private final RedisWrapper redisWrapper;
+  private final LocalCache<String, String> localCache;
+
   @Autowired
-  private RedisWrapper redisWrapper;
-  @Autowired
-  private LocalCache localCache;
+  public ProxyService(final RedisWrapper redisWrapper, final LocalCache localCache)
+  {
+    this.redisWrapper = redisWrapper;
+    this.localCache = localCache;
+  }
 
   public Mono<String> get(final String key)
   {
-    return localCache.get(key)
-        .switchIfEmpty(getFromRedis(key));
+    final var res = localCache.get("MyKey");
+    return localCache.get("MyKey")
+        .switchIfEmpty(Mono.defer(() -> getFromRedis(key)));
   }
 
   private Mono<String> getFromRedis(final String key)
