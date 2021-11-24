@@ -3,6 +3,8 @@ package com.jclavoie.redisproxy.core;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.jclavoie.redisproxy.core.cache.LocalCache;
+
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
@@ -22,7 +24,6 @@ public class ProxyService
 
   public Mono<String> get(final String key)
   {
-    final var res = localCache.get("MyKey");
     return localCache.get("MyKey")
         .switchIfEmpty(Mono.defer(() -> getFromRedis(key)));
   }

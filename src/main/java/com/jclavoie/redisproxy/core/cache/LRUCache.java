@@ -1,4 +1,4 @@
-package com.jclavoie.redisproxy.core;
+package com.jclavoie.redisproxy.core.cache;
 
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;

@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import com.jclavoie.redisproxy.core.cache.LocalCache;
+
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -44,5 +46,20 @@ public class ProxyServiceTest
         .expectNext("ResultRedis")
         .verifyComplete();
     verify(localCache, times(1)).put("MyKey", "ResultRedis");
+  }
+
+  @Test
+  public void get_notFoundInRedis_returnEmpty()
+  {
+    when(localCache.get("MyKey")).thenReturn(Mono.empty());
+    when(redisWrapper.get("MyKey")).thenReturn(Mono.empty());
+
+    StepVerifier.create(proxyService.get("MyKey"))
+        .expectNextCount(0)
+        .verifyComplete();
+
+    verify(localCache, times(1)).get("MyKey");
+    verify(redisWrapper, times(1)).get("MyKey");
+    verify(localCache, times(0)).put(anyString(), anyString());
   }
 }
