@@ -6,8 +6,17 @@ services:
     depends_on:
       - "redis"
     ports:
-      - "18080:8080"
+      - "8080:8080"
+    networks:
+      - my-network
+
   redis:
     image: "redis:alpine"
     ports:
-      - "16379:6379"
+      - "6379:6379"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    name: redis-proxy-network

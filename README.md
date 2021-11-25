@@ -6,3 +6,4 @@
 * Java implementation 1st run (Java app without cache ttl + unit tests + missing reddis, working in
   dockercompose) : 2h 45
 * Integrate Redis in code + make it work in docker compose : 1h
+* Python E2E simple set/get + its integration in a docker + test against the docker-compose : 1h30

@@ -7,6 +7,7 @@ authors = ['jean-christophe lavoie']
 [tool.poetry.dependencies]
 python = "^3.9.7"
 requests = "^2.26.0"
+redis = "^4.0.2"
 
 [tool.poetry.dev-dependencies]
 
