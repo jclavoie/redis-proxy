@@ -1,6 +1,5 @@
 package com.jclavoie.redisproxy.api;
 
-import static com.jclavoie.redisproxy.api.ProxyController.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +47,7 @@ public class ProxyControllerTest
 
     webTestClient
         .get()
-        .uri(builder -> builder.path(PROXY_ROUTE + "/{key}").build(key))
+        .uri(builder -> builder.path("/cache/{key}").build(key))
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
@@ -64,7 +63,7 @@ public class ProxyControllerTest
 
     webTestClient
         .get()
-        .uri(builder -> builder.path(PROXY_ROUTE + "/{key}").build(key))
+        .uri(builder -> builder.path("/cache/{key}").build(key))
         .exchange()
         .expectStatus()
         .isNotFound();
