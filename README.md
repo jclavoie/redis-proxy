@@ -7,3 +7,4 @@
   dockercompose) : 2h 45
 * Integrate Redis in code + make it work in docker compose : 1h
 * Python E2E simple set/get + its integration in a docker + test against the docker-compose : 1h30
+* Add Suite of E2E + implement cache expiry : 1h
