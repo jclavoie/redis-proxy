@@ -2,6 +2,8 @@ package com.jclavoie.redisproxy.core;
 
 import static org.mockito.Mockito.*;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -29,8 +31,9 @@ public class ProxyServiceTest
   @Test
   public void get_foundInCache_redisNotCalled()
   {
-    when(localCache.get("MyKey")).thenReturn(Mono.just("Result"));
-    StepVerifier.create(proxyService.get("MyKey"))
+    final var key = UUID.randomUUID().toString();
+    when(localCache.get(key)).thenReturn(Mono.just("Result"));
+    StepVerifier.create(proxyService.get(key))
         .expectNext("Result")
         .verifyComplete();
     verify(redisWrapper, times(0)).get(anyString());
@@ -39,27 +42,29 @@ public class ProxyServiceTest
   @Test
   public void get_notFoundInCache_foundInRedis_cacheUpdated()
   {
-    when(localCache.get("MyKey")).thenReturn(Mono.empty());
-    when(redisWrapper.get("MyKey")).thenReturn(Mono.just("ResultRedis"));
+    final var key = UUID.randomUUID().toString();
+    when(localCache.get(key)).thenReturn(Mono.empty());
+    when(redisWrapper.get(key)).thenReturn(Mono.just("ResultRedis"));
 
-    StepVerifier.create(proxyService.get("MyKey"))
+    StepVerifier.create(proxyService.get(key))
         .expectNext("ResultRedis")
         .verifyComplete();
-    verify(localCache, times(1)).put("MyKey", "ResultRedis");
+    verify(localCache, times(1)).put(key, "ResultRedis");
   }
 
   @Test
   public void get_notFoundInRedis_returnEmpty()
   {
-    when(localCache.get("MyKey")).thenReturn(Mono.empty());
-    when(redisWrapper.get("MyKey")).thenReturn(Mono.empty());
+    final var key = UUID.randomUUID().toString();
+    when(localCache.get(key)).thenReturn(Mono.empty());
+    when(redisWrapper.get(key)).thenReturn(Mono.empty());
 
-    StepVerifier.create(proxyService.get("MyKey"))
+    StepVerifier.create(proxyService.get(key))
         .expectNextCount(0)
         .verifyComplete();
 
-    verify(localCache, times(1)).get("MyKey");
-    verify(redisWrapper, times(1)).get("MyKey");
+    verify(localCache, times(1)).get(key);
+    verify(redisWrapper, times(1)).get(key);
     verify(localCache, times(0)).put(anyString(), anyString());
   }
 }

@@ -54,11 +54,11 @@ def __init__():
     global config, redis_write
     parser = argparse.ArgumentParser()
     parser.add_argument('--service-url',
-                        default=os.environ.get('SERVICE_URL', "http://localhost:18080/v1/cache"))
+                        default=os.environ.get('SERVICE_URL', "http://localhost:8080"))
     parser.add_argument('--redis-host',
                         default=os.environ.get('REDIS_HOST', "localhost"))
     parser.add_argument('--redis-port',
-                        default=os.environ.get('REDIS_PORT', "16379"))
+                        default=os.environ.get('REDIS_PORT', "6379"))
     parser.add_argument('--service-cache-size',
                         default=os.environ.get('SERVICE_CACHE_SIZE', 50))
     parser.add_argument('--service-cache-ttl',
@@ -85,13 +85,13 @@ def _wait_for_service_ready():
 
 def main():
     __init__()
-    print('hello world')
+    print("### Init by pinging service until it's ready ###")
     _wait_for_service_ready()
-    print("Service online!")
+    print("### Service Ready! ###")
     entries = _fill_redis(50)
     test_get_entries_from_http(entries)
     test_delete_from_redis_still_in_http_cache(entries)
-    test_wait_for_ttl_then_cache_empty()
+    test_wait_for_ttl_then_cache_empty(entries)
     exit(0)
 
 
