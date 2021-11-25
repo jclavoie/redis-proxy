@@ -2,6 +2,7 @@ package com.jclavoie.redisproxy.core;
 
 import static org.mockito.Mockito.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +33,7 @@ public class ProxyServiceTest
   public void get_foundInCache_redisNotCalled()
   {
     final var key = UUID.randomUUID().toString();
-    when(localCache.get(key)).thenReturn(Mono.just("Result"));
+    when(localCache.get(key)).thenReturn(Optional.of("Result"));
     StepVerifier.create(proxyService.get(key))
         .expectNext("Result")
         .verifyComplete();
@@ -43,7 +44,7 @@ public class ProxyServiceTest
   public void get_notFoundInCache_foundInRedis_cacheUpdated()
   {
     final var key = UUID.randomUUID().toString();
-    when(localCache.get(key)).thenReturn(Mono.empty());
+    when(localCache.get(key)).thenReturn(Optional.empty());
     when(redisWrapper.get(key)).thenReturn(Mono.just("ResultRedis"));
 
     StepVerifier.create(proxyService.get(key))
@@ -56,7 +57,7 @@ public class ProxyServiceTest
   public void get_notFoundInRedis_returnEmpty()
   {
     final var key = UUID.randomUUID().toString();
-    when(localCache.get(key)).thenReturn(Mono.empty());
+    when(localCache.get(key)).thenReturn(Optional.empty());
     when(redisWrapper.get(key)).thenReturn(Mono.empty());
 
     StepVerifier.create(proxyService.get(key))

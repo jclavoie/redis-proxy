@@ -24,7 +24,7 @@ public class ProxyService
 
   public Mono<String> get(final String key)
   {
-    return localCache.get(key)
+    return Mono.justOrEmpty(localCache.get(key))
         .switchIfEmpty(Mono.defer(() -> getFromRedis(key)));
   }
 
