@@ -8,6 +8,7 @@ authors = ['jean-christophe lavoie']
 python = "^3.9.7"
 requests = "^2.26.0"
 redis = "^4.0.2"
+busypie = "^0.4.5"
 
 [tool.poetry.dev-dependencies]
 
