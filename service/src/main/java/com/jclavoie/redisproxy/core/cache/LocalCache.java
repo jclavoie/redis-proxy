@@ -37,7 +37,6 @@ public class LocalCache<K, V>
         return Optional.empty();
       }
       log.info("Fetched value for key {} in Local Cache", key);
-      expiryCache.put(key, Instant.now().plus(Duration.ofSeconds(ttl)));
       return Optional.of(value);
     }
     else
