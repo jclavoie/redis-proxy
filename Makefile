@@ -1,6 +1,8 @@
 export cache_size?=200
 export cache_ttl?=10
 export max_concurrent_requests?=200
+export tcp_server_hostname?=localhost
+export tcp_server_port?=6379
 
 build-service:
 	cd service && make build
@@ -12,6 +14,7 @@ build: build-service build-e2e
 
 compose-up:
 	cache_size=${cache_size} cache_ttl=${cache_ttl} max_concurrent_requests=${max_concurrent_requests} \
+	tcp_server_hostname=${tcp_server_hostname} tcp_server_port=${tcp_server_port} \
  	docker-compose up -d
 
 test: build compose-up test-run compose-down

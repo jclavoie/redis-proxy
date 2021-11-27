@@ -9,6 +9,9 @@ import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
+import com.jclavoie.redisproxy.core.tcp.BeanTcpServer;
+import com.jclavoie.redisproxy.core.tcp.RedisCommandHandler;
+
 import lombok.extern.slf4j.Slf4j;
 
 @org.springframework.context.annotation.Configuration
@@ -29,7 +32,7 @@ public class ServerConfig
     return registry.bulkhead("concurrent_get");
   }
 
-  /*@Bean
+  @Bean
   public BeanTcpServer getRedisTcpServer(
       @Value("${application.redis-proxy.tcp.hostname:localhost}") final String host,
       @Value("${application.redis-proxy.tcp.port:6379}") final int port,
@@ -37,5 +40,5 @@ public class ServerConfig
   {
     return BeanTcpServer.builder().port(port).hostname(host).handler(commandHandler)
         .build();
-  }*/
+  }
 }
