@@ -19,7 +19,7 @@
     <testcontainers.version>1.16.0</testcontainers.version>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <deps.guava.version>31.0.1-jre</deps.guava.version>
+    <deps.resilience4j.version>1.7.1</deps.resilience4j.version>
   </properties>
 
   <dependencies>
@@ -31,10 +31,6 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webflux</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-redis</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -43,9 +39,15 @@
     </dependency>
 
     <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>${deps.guava.version}</version>
+      <groupId>io.github.resilience4j</groupId>
+      <artifactId>resilience4j-reactor</artifactId>
+      <version>${deps.resilience4j.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.github.resilience4j</groupId>
+      <artifactId>resilience4j-bulkhead</artifactId>
+      <version>${deps.resilience4j.version}</version>
     </dependency>
 
     <!-- Test dependencies -->

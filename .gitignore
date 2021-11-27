@@ -26,6 +26,7 @@ hs_err_pid*
 *.lock
 .python-version
 .venv
+*.iml
 
 .idea
 target
