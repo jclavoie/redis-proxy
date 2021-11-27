@@ -72,7 +72,7 @@ async def test_get_entries_from_http_after_redis_emptied(entries: OrderedDict):
 async def test_wait_for_ttl_then_cache_empty(entries: OrderedDict, ttl):
     # Here I'm not testing that the entries expire exactly at ttl but just that the feature works
     # as it's just sanity check E2E and not behavior unit test
-    print("### Testing care emptied after ttl ###")
+    print("### Testing cache emptied after ttl ###")
     elapsed = 0
     result = False
     while elapsed <= ttl + 5 and not result:
