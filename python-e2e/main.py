@@ -66,9 +66,13 @@ def test_get_entries_from_http_after_redis_emptied(entries: OrderedDict):
 
 
 def test_wait_for_ttl_then_cache_empty(entries: OrderedDict, ttl):
-    print("### Testing all entries deleted from REDIS still in Cache ###")
-    result = busypie.wait_at_most(int(ttl) + 10).poll_interval(busypie.FIVE_SECONDS).until(
-        lambda: _validate_all_items_absent(entries))
+    print("### Testing care emptied after ttl ###")
+    try:
+        result = busypie.wait_at_most(int(ttl) + 10).poll_interval(busypie.FIVE_SECONDS).until(
+            lambda: _validate_all_items_absent(entries))
+    except busypie.awaiter.ConditionTimeoutError as ex:
+        print(str(ex))
+        return False
     print("### TEST RESULT : %s" % str(result))
     return True
 
@@ -111,11 +115,17 @@ def main():
     print("### Init by pinging service until it's ready ###")
     _wait_for_service_ready()
     print("### Service Ready! ###")
-    entries = _fill_redis(config.cache_size)
-    test_get_entries_from_http(entries)
+    entries = _fill_redis(int(config.service_cache_size))
+    if not test_get_entries_from_http(entries):
+        print("Test Failed!")
+        exit(-1)
     _empty_redis()
-    test_get_entries_from_http_after_redis_emptied(entries)
-    test_wait_for_ttl_then_cache_empty(entries, config.service_cache_ttl)
+    if not test_get_entries_from_http_after_redis_emptied(entries):
+        print("Test Failed!")
+        exit(-1)
+    if not test_wait_for_ttl_then_cache_empty(entries, int(config.service_cache_ttl)):
+        print("Test Failed!")
+        exit(-1)
     exit(0)
 
 
