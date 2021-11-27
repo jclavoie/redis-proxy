@@ -38,7 +38,7 @@ async def _validate_all_items_gettable(entries: OrderedDict):
     responses = await _get_value_from_http_parallel(entries)
     for k, response in responses.items():
         if not response.status_code or response.text != str(entries[k]):
-            print("### TEST FAILED! Expected %s for key %s but go %s" % entries[k], k, response)
+            print("### TEST FAILED! Expected %s for key %s but go %s" % (entries[k], k, response))
             success = False
     return success
 

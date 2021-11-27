@@ -22,7 +22,7 @@ import reactor.test.StepVerifier;
 
 @SpringJUnitConfig
 @Slf4j
-public class BeanTcpServerTest
+public class RedisTcpServerTest
 {
 
   private static BeanTcpServer server;
@@ -33,7 +33,8 @@ public class BeanTcpServerTest
   public static void init()
   {
     proxyService = mock(ProxyService.class);
-    server = new BeanTcpServer("localhost", 0, new RedisCommandHandler(proxyService));
+    server = BeanTcpServer.builder().hostname("localhost").port(0).handler(
+        new RedisCommandHandler(proxyService)).build();
     server.init();
     redis = redisOperations(server.getPort());
   }

@@ -11,12 +11,6 @@ spring:
 server:
   shutdown: graceful
 
-application:
-  redis-proxy:
-    cache.size: ${LOCAL_CACHE_SIZE}
-    cache.ttl_second: ${LOCAL_CACHE_TTL_SECONDS}
-    requests.max_concurrent: ${MAX_CONCURRENT_REQUESTS}
-
 # Actuators
 management:
   server.port: 8081
@@ -60,6 +54,14 @@ spring:
     host: "redis"
     port: "6379"
     timeout: 60000
+  application:
+    redis-proxy:
+      cache.size: ${LOCAL_CACHE_SIZE}
+      cache.ttl_second: ${LOCAL_CACHE_TTL_SECONDS}
+      requests.max_concurrent: ${MAX_CONCURRENT_REQUESTS}
+      tcp:
+        hostname: ${TCP_SERVER_HOSTNAME}
+        port: ${TCP_SERVER_PORT}
 
 ---
 # Actuator properties https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html
