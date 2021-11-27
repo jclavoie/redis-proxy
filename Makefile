@@ -1,5 +1,5 @@
 export cache_size?=200
-export cache_ttl?=30
+export cache_ttl?=15
 
 build-service:
 	cd service && make build
