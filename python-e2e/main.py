@@ -3,10 +3,11 @@ import os
 from collections import OrderedDict
 from time import sleep
 
-import busypie
 import redis
 import requests
+import requests_threads
 
+async_session: requests_threads.AsyncSession
 redis_write: redis.Redis
 config = None
 
@@ -25,25 +26,28 @@ def _empty_redis():
     print("# Emptied REDIS #")
 
 
-def _get_value_from_http(key):
-    return requests.get(config.service_url + '/cache/' + key)
+async def _get_value_from_http_parallel(keys: OrderedDict):
+    rs = {}
+    for key, _ in keys.items():
+        rs[key] = await async_session.get(config.service_url + '/cache/' + key)
+    return rs
 
 
-def _validate_all_items_gettable(entries: OrderedDict):
+async def _validate_all_items_gettable(entries: OrderedDict):
     success = True
-    for k, v in entries.items():
-        response = _get_value_from_http(k)
-        if not response.status_code or response.text != str(v):
-            print("### TEST FAILED! Expected ", v, " for key ", k, "but got ", response.text)
+    responses = await _get_value_from_http_parallel(entries)
+    for k, response in responses.items():
+        if not response.status_code or response.text != str(entries[k]):
+            print("### TEST FAILED! Expected %s for key %s but go %s" % entries[k], k, response)
             success = False
     return success
 
 
-def _validate_all_items_absent(entries: OrderedDict):
+async def _validate_all_items_absent(entries: OrderedDict):
     success = True
+    responses = await _get_value_from_http_parallel(entries)
     found = []
-    for k, v in entries.items():
-        response = _get_value_from_http(k)
+    for k, response in responses.items():
         if response.status_code != 404:
             found.append(k)
             success = False
@@ -51,34 +55,40 @@ def _validate_all_items_absent(entries: OrderedDict):
     return success
 
 
-def test_get_entries_from_http(entries: OrderedDict):
+async def test_get_entries_from_http(entries: OrderedDict):
     print("### Testing all entries are gettable from http ###")
-    success = _validate_all_items_gettable(entries)
+    success = await _validate_all_items_gettable(entries)
     print("### TEST RESULT : %s" % str(success))
     return success
 
 
-def test_get_entries_from_http_after_redis_emptied(entries: OrderedDict):
+async def test_get_entries_from_http_after_redis_emptied(entries: OrderedDict):
     print("### Testing all entries deleted from REDIS still in Cache ###")
-    success = _validate_all_items_gettable(entries)
+    success = await _validate_all_items_gettable(entries)
     print("### TEST RESULT : %s" % str(success))
     return success
 
 
-def test_wait_for_ttl_then_cache_empty(entries: OrderedDict, ttl):
+async def test_wait_for_ttl_then_cache_empty(entries: OrderedDict, ttl):
+    # Here I'm not testing that the entries expire exactly at ttl but just that the feature works
+    # as it's just sanity check E2E and not behavior unit test
     print("### Testing care emptied after ttl ###")
-    try:
-        result = busypie.wait_at_most(int(ttl) + 10).poll_interval(busypie.FIVE_SECONDS).until(
-            lambda: _validate_all_items_absent(entries))
-    except busypie.awaiter.ConditionTimeoutError as ex:
-        print(str(ex))
-        return False
+    elapsed = 0
+    result = False
+    while elapsed <= ttl + 5 and not result:
+        print("TTL is %s and time elapsed %s" % (str(ttl), str(elapsed)))
+        result = await _validate_all_items_absent(entries)
+        if result:
+            break
+        sleep(5)
+        elapsed = elapsed + 5
+
     print("### TEST RESULT : %s" % str(result))
-    return True
+    return result
 
 
 def __init__():
-    global config, redis_write
+    global config, redis_write, async_session
     parser = argparse.ArgumentParser()
     parser.add_argument('--service-url',
                         default=os.environ.get('SERVICE_URL', "http://localhost:8080"))
@@ -94,6 +104,7 @@ def __init__():
     config = parser.parse_args()
     print(config)
     redis_write = redis.Redis(host=config.redis_host, port=config.redis_port, db=0)
+    async_session = requests_threads.AsyncSession(int(config.service_cache_size))
 
 
 def _wait_for_service_ready():
@@ -110,23 +121,24 @@ def _wait_for_service_ready():
             sleep(1)
 
 
-def main():
-    __init__()
-    print("### Init by pinging service until it's ready ###")
-    _wait_for_service_ready()
+async def main():
     print("### Service Ready! ###")
     entries = _fill_redis(int(config.service_cache_size))
-    if not test_get_entries_from_http(entries):
+    if not await test_get_entries_from_http(entries):
         print("Test Failed!")
         exit(-1)
     _empty_redis()
-    if not test_get_entries_from_http_after_redis_emptied(entries):
+    if not await test_get_entries_from_http_after_redis_emptied(entries):
         print("Test Failed!")
         exit(-1)
-    if not test_wait_for_ttl_then_cache_empty(entries, int(config.service_cache_ttl)):
+    if not await test_wait_for_ttl_then_cache_empty(entries, int(config.service_cache_ttl)):
         print("Test Failed!")
         exit(-1)
     exit(0)
 
 
-main()
+if __name__ == '__main__':
+    __init__()
+    print("### Init by pinging service until it's ready ###")
+    _wait_for_service_ready()
+    async_session.run(main)
