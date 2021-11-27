@@ -15,6 +15,7 @@ application:
   redis-proxy:
     cache.size: ${LOCAL_CACHE_SIZE}
     cache.ttl_second: ${LOCAL_CACHE_TTL_SECONDS}
+    requests.max_concurrent: ${MAX_CONCURRENT_REQUESTS}
 
 # Actuators
 management:

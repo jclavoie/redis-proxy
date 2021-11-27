@@ -4,6 +4,8 @@ import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.reactor.bulkhead.operator.BulkheadOperator;
 
+import java.time.Duration;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +34,13 @@ public class ProxyController
       value = "/cache/{key}")
   public Mono<ResponseEntity<String>> getValue(@PathVariable("key") final String key)
   {
+    log.info("Bulkhead capacity {} and free {}",
+        bulkhead.getMetrics().getMaxAllowedConcurrentCalls(),
+        bulkhead.getMetrics().getAvailableConcurrentCalls());
     return proxyService.get(key)
-        .map(result -> ResponseEntity.ok(result))
+        .delayElement(Duration.ofMillis(1000))
+        .elapsed()
+        .map(result -> ResponseEntity.ok(result.getT2()))
         .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()))
         .transformDeferred(BulkheadOperator.of(bulkhead))
         .onErrorResume(err ->

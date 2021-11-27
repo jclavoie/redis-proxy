@@ -12,7 +12,10 @@ import org.springframework.context.annotation.Bean;
 import com.jclavoie.redisproxy.core.RedisWrapper;
 import com.jclavoie.redisproxy.core.cache.LocalCache;
 
+import lombok.extern.slf4j.Slf4j;
+
 @org.springframework.context.annotation.Configuration
+@Slf4j
 public class CacheConfig
 {
   @Bean
@@ -31,8 +34,9 @@ public class CacheConfig
 
   @Bean
   public Bulkhead getRestThrottlingLimiter(
-      @Value("${application.redis-proxy.max_concurrent_request}") final int maxNbRequests)
+      @Value("${application.redis-proxy.requests.max_concurrent}") final int maxNbRequests)
   {
+    log.info("Max concurrent requests is {}", maxNbRequests);
     final var config =
         BulkheadConfig.custom()
             .maxConcurrentCalls(maxNbRequests)

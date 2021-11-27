@@ -12,6 +12,7 @@ services:
     environment:
       - LOCAL_CACHE_SIZE=${cache_size}
       - LOCAL_CACHE_TTL_SECONDS=${cache_ttl}
+      - MAX_CONCURRENT_REQUESTS=${max_concurrent_requests}
 
   redis:
     image: "redis:alpine"
