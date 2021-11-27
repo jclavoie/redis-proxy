@@ -7,5 +7,4 @@
 * Integrate Redis in code + make it work in docker compose : 1h
 * Python E2E simple set/get + its integration in a docker + test against the docker-compose : 1h30
 * Add Suite of E2E + implement cache expiry : 1h
-* Rework E2E for cache ttl test + fix bug : 45m
-* Wrap configurable cache size + cache ttl accross docker compose + test : 30m
+* Rework E2E for cache ttl test + wrap tests & app config with env variables : 1h30
