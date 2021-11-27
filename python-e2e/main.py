@@ -13,7 +13,7 @@ config = None
 
 
 def _fill_redis(size):
-    print("### Fill %s entries in Redis ###")
+    print("### Fill %s entries in Redis ###" % size)
     entries = OrderedDict()
     for i in range(size):
         entries[str(i)] = "value_" + str(i)
@@ -97,9 +97,9 @@ def __init__():
     parser.add_argument('--redis-port',
                         default=os.environ.get('REDIS_PORT', "6379"))
     parser.add_argument('--service-cache-size',
-                        default=os.environ.get('SERVICE_CACHE_SIZE', 50))
+                        default=os.environ.get('SERVICE_CACHE_SIZE', 20))
     parser.add_argument('--service-cache-ttl',
-                        default=os.environ.get('SERVICE_CACHE_TTL', 60))
+                        default=os.environ.get('SERVICE_CACHE_TTL', 10))
 
     config = parser.parse_args()
     print(config)
@@ -117,7 +117,7 @@ def _wait_for_service_ready():
             else:
                 sleep(1)
         except Exception as ex:
-            print("Failed to ping service, waiting %s", str(ex))
+            print("Failed to ping service, waiting %s" % str(ex))
             sleep(1)
 
 
