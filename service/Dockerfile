@@ -16,6 +16,7 @@ ARG TAG
 COPY --from=builder /home/app/target/redis-proxy-${TAG}.jar app.jar
 COPY docker-entrypoint.sh /usr/local/bin/
 EXPOSE 8080
+EXPOSE 6379
 
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh && ln -s /usr/local/bin/docker-entrypoint.sh /
 ENTRYPOINT ["sh", "docker-entrypoint.sh"]

@@ -43,9 +43,14 @@ spring:
   redis:
     database: 0
     host: "127.0.0.1"
-    port: "16379"
+    port: "6379"
     timeout: 60000
 
+application:
+  redis-proxy:
+    tcp:
+      hostname: "localhost"
+      port: 36379
 ---
 spring:
   config.activate.on-profile: compose
@@ -60,9 +65,9 @@ application:
     cache.size: ${LOCAL_CACHE_SIZE}
     cache.ttl_second: ${LOCAL_CACHE_TTL_SECONDS}
     requests.max_concurrent: ${MAX_CONCURRENT_REQUESTS}
-    tcp:
-      hostname: ${TCP_SERVER_HOSTNAME}
-      port: ${TCP_SERVER_PORT}
+      #tcp:
+    # hostname: "localhost"
+    # port: 36379
 
 ---
 # Actuator properties https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html

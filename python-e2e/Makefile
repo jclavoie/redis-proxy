@@ -9,4 +9,7 @@ build:
 
 run:
 	@docker run --rm --network=redis-proxy-network  -e SERVICE_CACHE_SIZE=${cache_size} -e SERVICE_CACHE_TTL=${cache_ttl} \
- 	-e MAX_CONCURRENT_REQUESTS=${max_concurrent_requests} ${E2E_IMAGE}:${TAG}
+ 	-e MAX_CONCURRENT_REQUESTS=${max_concurrent_requests} \
+ 	-e  SERVICE_NAME=${proxy_service_name} -e SERVICE_PORT=${proxy_service_http_port} \
+ 	-e SERVICE_TCP_PORT=${tcp_server_port} \
+ 	 ${E2E_IMAGE}:${TAG}

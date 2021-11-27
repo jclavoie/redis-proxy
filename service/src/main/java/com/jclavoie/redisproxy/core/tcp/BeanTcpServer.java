@@ -24,6 +24,7 @@ public class BeanTcpServer
   @PostConstruct
   public void init()
   {
+    log.info("Initialing TCP server");
     server = TcpServer
         .create()
         .host(hostname)
