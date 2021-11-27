@@ -2,23 +2,12 @@ version: '3.8'
 
 services:
   redis-proxy:
-    image: jclavoie/redis-proxy:0.0.1-SNAPSHOT
-    depends_on:
-      - "redis"
-    ports:
-      - "8080:8080"
+    image: jclavoie/python-e2e:0.0.1-SNAPSHOT
     networks:
       - my-network
     environment:
       - LOCAL_CACHE_SIZE=${cache_size}
       - LOCAL_CACHE_TTL_SECONDS=${cache_ttl}
-
-  redis:
-    image: "redis:alpine"
-    ports:
-      - "6379:6379"
-    networks:
-      - my-network
 
 networks:
   my-network:

@@ -13,8 +13,8 @@ server:
 
 application:
   redis-proxy:
-    cache.size: 50
-    cache.ttl_second: 20
+    cache.size: ${LOCAL_CACHE_SIZE}
+    cache.ttl_second: ${LOCAL_CACHE_TTL_SECONDS}
 
 # Actuators
 management:

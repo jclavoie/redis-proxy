@@ -1,5 +1,5 @@
-export TAG = 0.0.1-SNAPSHOT
-export RP_IMAGE = jclavoie/redis-proxy
+export cache_size?=200
+export cache_ttl?=30
 
 build-service:
 	cd service && make build
@@ -10,17 +10,12 @@ build-e2e:
 build: build-service build-e2e
 
 compose-up:
-	docker-compose up -d
-	#@echo "Pausing for 5 seconds so it's fully initiated"
-	#@sleep 5
+	cache_size=${cache_size} cache_ttl=${cache_ttl} docker-compose up -d
 
-test: build compose-up
-	cd python-e2e && make run
-	make compose-down
-
-test-no-build: compose-up
-	cd python-e2e && make run
-	make compose-down
+test: build compose-up test-run compose-down
+test-no-build: compose-up test-run compose-down
+test-run:
+	cd python-e2e && $(MAKE) run
 
 compose-down:
 	docker-compose down

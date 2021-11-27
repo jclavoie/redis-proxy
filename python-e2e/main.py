@@ -47,7 +47,7 @@ def _validate_all_items_absent(entries: OrderedDict):
         if response.status_code != 404:
             found.append(k)
             success = False
-    print("Found %i items in cache", len(found))
+    print("Found %i items in cache" % len(found))
     return success
 
 
@@ -111,7 +111,7 @@ def main():
     print("### Init by pinging service until it's ready ###")
     _wait_for_service_ready()
     print("### Service Ready! ###")
-    entries = _fill_redis(50)
+    entries = _fill_redis(config.cache_size)
     test_get_entries_from_http(entries)
     _empty_redis()
     test_get_entries_from_http_after_redis_emptied(entries)
