@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  redis-proxy:
+    image: jclavoie/python-e2e:0.0.1-SNAPSHOT
+    networks:
+      - my-network
+    environment:
+      - SERVICE_CACHE_SIZE=${cache_size}
+      - SERVICE_CACHE_TTL_SECONDS=${cache_ttl}
+
+networks:
+  my-network:
+    name: redis-proxy-network

@@ -9,6 +9,9 @@ services:
       - "8080:8080"
     networks:
       - my-network
+    environment:
+      - LOCAL_CACHE_SIZE=${cache_size}
+      - LOCAL_CACHE_TTL_SECONDS=${cache_ttl}
 
   redis:
     image: "redis:alpine"
