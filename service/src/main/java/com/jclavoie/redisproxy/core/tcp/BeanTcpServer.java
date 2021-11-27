@@ -1,17 +1,15 @@
 package com.jclavoie.redisproxy.core.tcp;
 
-import io.netty.buffer.Unpooled;
-
-import java.nio.charset.StandardCharsets;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import reactor.netty.ByteBufMono;
 import reactor.netty.DisposableServer;
 import reactor.netty.tcp.TcpServer;
 
@@ -24,12 +22,15 @@ public class BeanTcpServer
   @Value("${application.redis-proxy.tcp.port:6379}")
   @Getter
   private int port;
+  private final CommandHandler handler;
   private DisposableServer server;
 
-  public BeanTcpServer(final String hostname, final int port)
+  @Autowired
+  public BeanTcpServer(final String hostname, final int port, final CommandHandler commandHandler)
   {
     this.hostname = hostname;
     this.port = port;
+    this.handler = commandHandler;
   }
 
   @PostConstruct
@@ -45,7 +46,7 @@ public class BeanTcpServer
               inbound.receive()
                   .retain()
                   .asString()
-                  .map(val -> Unpooled.copiedBuffer(val.getBytes(StandardCharsets.UTF_8))));
+                  .flatMap(val -> ByteBufMono.fromString(handler.handleCommand(val))));
         }).bindNow();
 
     if (port == 0)
