@@ -16,4 +16,5 @@
 * Add Suite of E2E + implement cache expiry : 1h
 * Rework E2E for cache ttl test + wrap tests & app config with env variables : 1h30
 * Rework E2E do make http requests in parallel : 30m
-* Implement concurrent request limiter. 1h+
+* Implement concurrent request limiter. 2h but I spent most of time trying to trigger by the E2E,
+  which I wasn't able to

@@ -1,6 +1,6 @@
-export cache_size?=10
+export cache_size?=200
 export cache_ttl?=10
-export max_concurrent_requests?=1
+export max_concurrent_requests?=200
 
 build-service:
 	cd service && make build
@@ -14,7 +14,7 @@ compose-up:
 	cache_size=${cache_size} cache_ttl=${cache_ttl} max_concurrent_requests=${max_concurrent_requests} docker-compose up -d
 
 test: build compose-up test-run compose-down
-test-no-build: compose-up test-run #compose-down
+test-no-build: compose-up test-run compose-down
 test-run:
 	cd python-e2e && $(MAKE) run
 

@@ -20,8 +20,8 @@ public class CacheConfig
 {
   @Bean
   public LocalCache<String, String> getLocalCache(
-      @Value("${application.redis-proxy.cache.size}") final int cacheSize,
-      @Value("${application.redis-proxy.cache.ttl_second}") final int ttlSecond)
+      @Value("${application.redis-proxy.cache.size:20}") final int cacheSize,
+      @Value("${application.redis-proxy.cache.ttl_second:10}") final int ttlSecond)
   {
     return new LocalCache<>(cacheSize, ttlSecond);
   }
@@ -34,7 +34,7 @@ public class CacheConfig
 
   @Bean
   public Bulkhead getRestThrottlingLimiter(
-      @Value("${application.redis-proxy.requests.max_concurrent}") final int maxNbRequests)
+      @Value("${application.redis-proxy.requests.max_concurrent:100}") final int maxNbRequests)
   {
     log.info("Max concurrent requests is {}", maxNbRequests);
     final var config =

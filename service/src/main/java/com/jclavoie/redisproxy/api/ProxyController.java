@@ -4,8 +4,6 @@ import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.reactor.bulkhead.operator.BulkheadOperator;
 
-import java.time.Duration;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,14 +32,13 @@ public class ProxyController
       value = "/cache/{key}")
   public Mono<ResponseEntity<String>> getValue(@PathVariable("key") final String key)
   {
-    log.info("Bulkhead capacity {} and free {}",
-        bulkhead.getMetrics().getMaxAllowedConcurrentCalls(),
-        bulkhead.getMetrics().getAvailableConcurrentCalls());
     return proxyService.get(key)
-        .delayElement(Duration.ofMillis(1000))
-        .elapsed()
-        .map(result -> ResponseEntity.ok(result.getT2()))
+        .map(result -> ResponseEntity.ok(result))
         .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()))
+        /* I'm not sure entirely sure this works like I thought it would.
+           I can easily test it with junit by forcing the `tryAcquire` to fail
+           but I wasn't able to trigger during normal operaiton, even with a limit of 1 request
+         */
         .transformDeferred(BulkheadOperator.of(bulkhead))
         .onErrorResume(err ->
         {
