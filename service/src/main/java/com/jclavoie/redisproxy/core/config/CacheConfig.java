@@ -3,7 +3,6 @@ package com.jclavoie.redisproxy.core.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
-import com.jclavoie.redisproxy.core.RedisWrapper;
 import com.jclavoie.redisproxy.core.cache.LocalCache;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +19,4 @@ public class CacheConfig
     return new LocalCache<>(cacheSize, ttlSecond);
   }
 
-  @Bean
-  public RedisWrapper getRedisWrapper()
-  {
-    return new RedisWrapper();
-  }
-  
 }

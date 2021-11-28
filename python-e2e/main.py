@@ -7,6 +7,8 @@ from time import sleep
 import redis
 import requests
 import requests_threads
+from requests.adapters import HTTPAdapter
+from urllib3 import Retry
 
 async_session: requests_threads.AsyncSession
 redis_write: redis.Redis
@@ -154,17 +156,17 @@ def __init__():
 
 
 def _wait_for_service_ready():
-    success = False
-    while not success:
-        try:
-            resp = requests.get(service_http_url + '/health')
-            if resp.status_code == 200:
-                success = True
-            else:
-                sleep(1)
-        except Exception as ex:
-            print("Failed to ping service, waiting %s" % str(ex))
-            sleep(1)
+    with requests.Session() as s:
+        adapter = HTTPAdapter(max_retries=Retry(total=15,
+                                                backoff_factor=1, raise_on_status=False,
+                                                status_forcelist=[500, 502, 503, 504]))
+        s.mount('http://', adapter)
+        response = s.get(service_http_url + '/health')
+        if 200 <= response.status_code <= 299:
+            print("Service Ready!")
+            return True
+        else:
+            raise Exception("Service Failed to be reachable in 15 seconds")
 
 
 async def main():

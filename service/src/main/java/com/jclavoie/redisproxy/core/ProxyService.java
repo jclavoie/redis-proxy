@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.jclavoie.redisproxy.core.cache.LocalCache;
+import com.jclavoie.redisproxy.core.cache.RedisCache;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -12,11 +13,11 @@ import reactor.core.publisher.Mono;
 @Component
 public class ProxyService
 {
-  private final RedisWrapper redisWrapper;
+  private final RedisCache redisWrapper;
   private final LocalCache<String, String> localCache;
 
   @Autowired
-  public ProxyService(final RedisWrapper redisWrapper, final LocalCache localCache)
+  public ProxyService(final RedisCache redisWrapper, final LocalCache localCache)
   {
     this.redisWrapper = redisWrapper;
     this.localCache = localCache;
