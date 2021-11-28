@@ -46,7 +46,7 @@ public class LocalCache<K, V>
 
   }
 
-  /* TODO : Make it non blocking ?*/
+  /* Blocking here is not ideal because we're in a reactive core but heh */
   public synchronized void put(final K key, final V value)
   {
     cache.put(key, value);

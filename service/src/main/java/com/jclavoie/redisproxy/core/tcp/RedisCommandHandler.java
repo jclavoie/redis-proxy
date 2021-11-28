@@ -37,6 +37,7 @@ public class RedisCommandHandler implements CommandHandler
 
   private Mono<String> handleHello(final String[] command)
   {
+    //Stupid hello that just echo back
     var response = new String();
     for (String part : command)
     {
