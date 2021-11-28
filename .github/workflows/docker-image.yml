@@ -1,0 +1,23 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build RedisProxy Service
+      run: make build-service
+    - name: Build E2E Project
+      run: make build-e2e
+    - name: Run E2E
+      run: make test-no-build
+      
