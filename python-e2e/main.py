@@ -117,14 +117,14 @@ def __init__():
                         default=os.environ.get('SERVICE_PORT', 18080))
     parser.add_argument('--service-tcp-port',
                         default=os.environ.get('SERVICE_TCP_PORT', 16379))
-    parser.add_argument('--redis-host',
-                        default=os.environ.get('REDIS_HOST', "localhost"))
-    parser.add_argument('--redis-port',
-                        default=os.environ.get('REDIS_PORT', 6379))
     parser.add_argument('--service-cache-size',
                         default=os.environ.get('SERVICE_CACHE_SIZE', 20))
     parser.add_argument('--service-cache-ttl',
                         default=os.environ.get('SERVICE_CACHE_TTL', 5))
+    parser.add_argument('--redis-host',
+                        default=os.environ.get('REDIS_SERVICE_NAME', "localhost"))
+    parser.add_argument('--redis-port',
+                        default=os.environ.get('REDIS_SERVICE_PORT', 6379))
 
     config = parser.parse_args()
     print(config)
