@@ -7,6 +7,8 @@ from time import sleep
 import redis
 import requests
 import requests_threads
+from requests.adapters import HTTPAdapter
+from urllib3 import Retry
 
 async_session: requests_threads.AsyncSession
 redis_write: redis.Redis
@@ -29,26 +31,30 @@ def _empty_redis():
     print("# Emptied REDIS #")
 
 
-async def _get_value_from_http_parallel(keys: OrderedDict):
-    rs = {}
+async def _get_value_from_http_parallel(keys: OrderedDict,
+                                        session: requests_threads.AsyncSession):
+    promises = {}
+    responses = {}
     for key, _ in keys.items():
-        rs[key] = await async_session.get(service_http_url + '/cache/' + key)
-    return rs
+        promises[key] = session.get(service_http_url + '/cache/' + key)
+    for key, promise in promises.items():
+        responses[key] = await promise
+    return responses
 
 
 async def _validate_all_items_gettable(entries: OrderedDict):
     success = True
-    responses = await _get_value_from_http_parallel(entries)
+    responses = await _get_value_from_http_parallel(entries, async_session)
     for k, response in responses.items():
         if not response.status_code or response.text != str(entries[k]):
-            print("### TEST FAILED! Expected %s for key %s but go %s" % (entries[k], k, response))
+            print("### TEST FAILED! Expected %s for key %s but got %s" % (entries[k], k, response))
             success = False
     return success
 
 
 async def _validate_all_items_absent(entries: OrderedDict):
     success = True
-    responses = await _get_value_from_http_parallel(entries)
+    responses = await _get_value_from_http_parallel(entries, async_session)
     found = []
     for k, response in responses.items():
         if response.status_code != 404:
@@ -108,6 +114,19 @@ def test_get_from_redis_tcp_proxy():
     return True
 
 
+async def test_bust_concurrent_request_limit():
+    print("### Testing busting concurrent limit gives 429 ###")
+    target = int(config.service_max_requests) * 4
+    success = False
+    entries = _fill_redis(target)
+    responses = await _get_value_from_http_parallel(entries, requests_threads.AsyncSession(target))
+    for k, response in responses.items():
+        if response.status_code == 429 and not success:
+            print("### TEST SUCCESS! 429 received")
+            success = True
+    return success
+
+
 def __init__():
     global config, redis_write, redis_read, async_session, service_http_url
     parser = argparse.ArgumentParser()
@@ -117,36 +136,37 @@ def __init__():
                         default=os.environ.get('SERVICE_PORT', 18080))
     parser.add_argument('--service-tcp-port',
                         default=os.environ.get('SERVICE_TCP_PORT', 16379))
-    parser.add_argument('--redis-host',
-                        default=os.environ.get('REDIS_HOST', "localhost"))
-    parser.add_argument('--redis-port',
-                        default=os.environ.get('REDIS_PORT', 6379))
     parser.add_argument('--service-cache-size',
                         default=os.environ.get('SERVICE_CACHE_SIZE', 20))
     parser.add_argument('--service-cache-ttl',
                         default=os.environ.get('SERVICE_CACHE_TTL', 5))
+    parser.add_argument('--service-max-requests',
+                        default=os.environ.get('SERVICE_MAX_REQUESTS', 5))
+    parser.add_argument('--redis-host',
+                        default=os.environ.get('REDIS_SERVICE_NAME', "localhost"))
+    parser.add_argument('--redis-port',
+                        default=os.environ.get('REDIS_SERVICE_PORT', 6379))
 
     config = parser.parse_args()
     print(config)
     service_http_url = "http://" + config.service_name + ":" + str(config.service_port)
     redis_write = redis.Redis(host=config.redis_host, port=config.redis_port, db=0)
-    print(config.service_name, config.service_tcp_port)
     redis_read = redis.Redis(host=config.service_name, port=config.service_tcp_port)
-    async_session = requests_threads.AsyncSession(int(config.service_cache_size))
+    async_session = requests_threads.AsyncSession(int(config.service_max_requests))
 
 
 def _wait_for_service_ready():
-    success = False
-    while not success:
-        try:
-            resp = requests.get(service_http_url + '/health')
-            if resp.status_code == 200:
-                success = True
-            else:
-                sleep(1)
-        except Exception as ex:
-            print("Failed to ping service, waiting %s" % str(ex))
-            sleep(1)
+    with requests.Session() as s:
+        adapter = HTTPAdapter(max_retries=Retry(total=15,
+                                                backoff_factor=1, raise_on_status=False,
+                                                status_forcelist=[500, 502, 503, 504]))
+        s.mount('http://', adapter)
+        response = s.get(service_http_url + '/health')
+        if 200 <= response.status_code <= 299:
+            print("Service Ready!")
+            return True
+        else:
+            raise Exception("Service Failed to be reachable in 15 seconds")
 
 
 async def main():
@@ -162,6 +182,11 @@ async def main():
     if not await test_wait_for_ttl_then_cache_empty(entries, int(config.service_cache_ttl)):
         print("Test Failed!")
         exit(-1)
+    # Not executing this test because it's flaky as we'd need a very low max number of
+    # concurrent requests and a high number of actually concurrent one
+    # if not await test_bust_concurrent_request_limit():
+    #    print("Test Failed!")
+    #    exit(-1)
     if not test_get_from_redis_tcp_proxy():
         print("Test Failed!")
         exit(-1)

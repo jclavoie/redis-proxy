@@ -20,3 +20,4 @@
   the E2E, which I wasn't able to
 * Implement simple REDIS protocol on TCP: 1h30
 * Figuring out that a docker container needs to listen to 0.0.0.0 and not localhost : a few hours
+* Cleanup makefile & code a bit : 1h

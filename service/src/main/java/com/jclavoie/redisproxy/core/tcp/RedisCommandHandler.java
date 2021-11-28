@@ -22,6 +22,8 @@ public class RedisCommandHandler implements CommandHandler
   {
     /**
      * Keep it simple and stupid just for HELLO and GET
+     * that work with our test setup. In a more complete solution
+     * we'd be traversing the entries and building the command from there
      */
     final var values = command.split("\r\n");
     if (values[2].equals("HELLO") && values.length >= 3)
@@ -37,6 +39,7 @@ public class RedisCommandHandler implements CommandHandler
 
   private Mono<String> handleHello(final String[] command)
   {
+    //Stupid hello that just echo back
     var response = new String();
     for (String part : command)
     {

@@ -6,10 +6,8 @@ import javax.annotation.PreDestroy;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufMono;
 import reactor.netty.DisposableServer;
-import reactor.netty.tcp.TcpClient;
 import reactor.netty.tcp.TcpServer;
 
 //@Controller
@@ -44,13 +42,6 @@ public class BeanTcpServer
     {
       port = server.port();
     }
-
-    final var client = TcpClient.create()
-        .host("localhost")
-        .port(port)
-        .connectNow()
-        .bind();
-    client.outbound().sendString(Mono.just("hello")).then().block();
   }
 
   @PreDestroy

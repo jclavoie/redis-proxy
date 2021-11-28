@@ -1,4 +1,6 @@
-package com.jclavoie.redisproxy.core;
+package com.jclavoie.redisproxy.core.cache;
+
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 
@@ -11,7 +13,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 @Slf4j
-public class RedisWrapper
+public class RedisCache
 {
   @Autowired
   private ReactiveRedisOperations<String, String> redisTemplate;
@@ -19,8 +21,9 @@ public class RedisWrapper
   @PostConstruct
   public void testConnection()
   {
-    redisTemplate.opsForValue().set("test", "success")
-        .flatMap(resp -> redisTemplate.opsForValue().get("test"))
+    final var key = UUID.randomUUID().toString();
+    redisTemplate.opsForValue().set(key, "success")
+        .flatMap(resp -> redisTemplate.opsForValue().getAndDelete(key))
         .subscribe(response -> log.info("response from redis : {}", response));
   }
 

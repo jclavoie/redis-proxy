@@ -11,11 +11,13 @@ services:
     networks:
       - my-network
     environment:
-      - LOCAL_CACHE_SIZE=${cache_size}
-      - LOCAL_CACHE_TTL_SECONDS=${cache_ttl}
-      - MAX_CONCURRENT_REQUESTS=${max_concurrent_requests}
-      - TCP_SERVER_HOSTNAME=0.0.0.0
-      - TCP_SERVER_PORT=${tcp_server_port}
+      - LOCAL_CACHE_SIZE=${proxy_service_cache_size}
+      - LOCAL_CACHE_TTL_SECONDS=${proxy_service_cache_ttl}
+      - MAX_CONCURRENT_REQUESTS=${proxy_service_max_concurrent_requests}
+      - TCP_SERVER_HOSTNAME=${proxy_service_tcp_hostname}
+      - TCP_SERVER_PORT=${proxy_service_tcp_port}
+      - REDIS_SERVICE_NAME=${redis_service_name}
+      - REDIS_SERVICE_PORT=${redis_service_port}
 
   redis:
     image: "redis:alpine"

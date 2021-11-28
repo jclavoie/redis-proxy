@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.jclavoie.redisproxy.core.cache.LocalCache;
+import com.jclavoie.redisproxy.core.cache.RedisCache;
 
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -19,14 +20,14 @@ public class ProxyServiceTest
 {
   ProxyService proxyService;
   LocalCache<String, String> localCache;
-  RedisWrapper redisWrapper;
+  RedisCache redisCache;
 
   @BeforeEach
   public void init()
   {
     localCache = mock(LocalCache.class);
-    redisWrapper = mock(RedisWrapper.class);
-    proxyService = new ProxyService(redisWrapper, localCache);
+    redisCache = mock(RedisCache.class);
+    proxyService = new ProxyService(redisCache, localCache);
   }
 
   @Test
@@ -37,7 +38,7 @@ public class ProxyServiceTest
     StepVerifier.create(proxyService.get(key))
         .expectNext("Result")
         .verifyComplete();
-    verify(redisWrapper, times(0)).get(anyString());
+    verify(redisCache, times(0)).get(anyString());
   }
 
   @Test
@@ -45,7 +46,7 @@ public class ProxyServiceTest
   {
     final var key = UUID.randomUUID().toString();
     when(localCache.get(key)).thenReturn(Optional.empty());
-    when(redisWrapper.get(key)).thenReturn(Mono.just("ResultRedis"));
+    when(redisCache.get(key)).thenReturn(Mono.just("ResultRedis"));
 
     StepVerifier.create(proxyService.get(key))
         .expectNext("ResultRedis")
@@ -58,14 +59,14 @@ public class ProxyServiceTest
   {
     final var key = UUID.randomUUID().toString();
     when(localCache.get(key)).thenReturn(Optional.empty());
-    when(redisWrapper.get(key)).thenReturn(Mono.empty());
+    when(redisCache.get(key)).thenReturn(Mono.empty());
 
     StepVerifier.create(proxyService.get(key))
         .expectNextCount(0)
         .verifyComplete();
 
     verify(localCache, times(1)).get(key);
-    verify(redisWrapper, times(1)).get(key);
+    verify(redisCache, times(1)).get(key);
     verify(localCache, times(0)).put(anyString(), anyString());
   }
 }
