@@ -14,8 +14,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Build the Docker image
-      run: make build
-    - name: Run tests
+    - name: Build RedisProxy Service
+      run: make build-service
+    - name: Build E2E Project
+      run: make build-e2e
+    - name: Run E2E
       run: make test-no-build
       
