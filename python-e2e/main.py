@@ -114,22 +114,23 @@ def __init__():
     parser.add_argument('--service-name',
                         default=os.environ.get('SERVICE_NAME', "localhost"))
     parser.add_argument('--service-port',
-                        default=os.environ.get('SERVICE_PORT', 8080))
+                        default=os.environ.get('SERVICE_PORT', 18080))
     parser.add_argument('--service-tcp-port',
-                        default=os.environ.get('SERVICE_TCP_PORT', 36379))
+                        default=os.environ.get('SERVICE_TCP_PORT', 16379))
     parser.add_argument('--redis-host',
                         default=os.environ.get('REDIS_HOST', "localhost"))
     parser.add_argument('--redis-port',
-                        default=os.environ.get('REDIS_PORT', "6379"))
+                        default=os.environ.get('REDIS_PORT', 6379))
     parser.add_argument('--service-cache-size',
                         default=os.environ.get('SERVICE_CACHE_SIZE', 20))
     parser.add_argument('--service-cache-ttl',
-                        default=os.environ.get('SERVICE_CACHE_TTL', 10))
+                        default=os.environ.get('SERVICE_CACHE_TTL', 5))
 
     config = parser.parse_args()
     print(config)
     service_http_url = "http://" + config.service_name + ":" + str(config.service_port)
     redis_write = redis.Redis(host=config.redis_host, port=config.redis_port, db=0)
+    print(config.service_name, config.service_tcp_port)
     redis_read = redis.Redis(host=config.service_name, port=config.service_tcp_port)
     async_session = requests_threads.AsyncSession(int(config.service_cache_size))
 

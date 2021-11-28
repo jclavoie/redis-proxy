@@ -14,8 +14,8 @@ services:
       - LOCAL_CACHE_SIZE=${cache_size}
       - LOCAL_CACHE_TTL_SECONDS=${cache_ttl}
       - MAX_CONCURRENT_REQUESTS=${max_concurrent_requests}
-      #- TCP_SERVER_HOSTNAME=${tcp_server_hostname}
-      #- TCP_SERVER_PORT=${tcp_server_port}
+      - TCP_SERVER_HOSTNAME=0.0.0.0
+      - TCP_SERVER_PORT=6379
 
   redis:
     image: "redis:alpine"

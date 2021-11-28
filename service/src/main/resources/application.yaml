@@ -65,9 +65,9 @@ application:
     cache.size: ${LOCAL_CACHE_SIZE}
     cache.ttl_second: ${LOCAL_CACHE_TTL_SECONDS}
     requests.max_concurrent: ${MAX_CONCURRENT_REQUESTS}
-      #tcp:
-    # hostname: "localhost"
-    # port: 36379
+    tcp:
+      hostname: ${TCP_SERVER_HOSTNAME}
+      port: ${TCP_SERVER_PORT}
 
 ---
 # Actuator properties https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html

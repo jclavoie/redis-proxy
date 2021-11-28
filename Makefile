@@ -1,5 +1,5 @@
 export cache_size?=200
-export cache_ttl?=10
+export cache_ttl?=5
 export max_concurrent_requests?=200
 export tcp_server_hostname?=localhost
 export tcp_server_port?=6379

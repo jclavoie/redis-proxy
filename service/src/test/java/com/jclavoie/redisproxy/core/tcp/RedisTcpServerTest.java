@@ -69,7 +69,7 @@ public class RedisTcpServerTest
         .expectNextCount(0)
         .verifyComplete();
   }
-
+  
   private static ReactiveRedisOperations<String, String> redisOperations(final int port)
   {
     final var factory = new LettuceConnectionFactory("localhost", port);
