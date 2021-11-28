@@ -64,6 +64,17 @@ The root-level Makefile supports the following commands:
 
 So simply running the `make test` command will take of everything
 
+The following parameters are configurable in the Makefile and propagates across services :
+
+* proxy_service_cache_size = 100 (max size of local cache)
+* proxy_service_cache_ttl = 10 (expiry time in second of local cache)
+* proxy_service_max_concurrent_requests = 100 (max requests allowed by the service)
+* proxy_service_name = redis-proxy (dns-name of the proxy service)
+* proxy_service_http_port = 8080 (http port of the proxy service)
+* proxy_service_tcp_port = 6379 (redis port of the proxy service)
+* proxy_service_tcp_hostname = 0.0.0.0 (address of the interface the TCP server listens from)
+* redis_service_name = redis (dns-name of the redis instance)
+
 ## How long did you spent on each part of the project
 
 * Basic Setup (git setup, ide setup, Spring base project + dockerfile/compose + makefile) : 1h 45
