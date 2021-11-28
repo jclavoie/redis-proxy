@@ -1,6 +1,6 @@
-export proxy_service_cache_size?=200
+export proxy_service_cache_size?=100
 export proxy_service_cache_ttl?=10
-export proxy_service_max_concurrent_requests?=200
+export proxy_service_max_concurrent_requests?=100
 export proxy_service_name?=redis-proxy
 export proxy_service_http_port?=8080
 export proxy_service_tcp_port?=6379

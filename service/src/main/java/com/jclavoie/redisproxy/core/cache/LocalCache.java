@@ -2,9 +2,9 @@ package com.jclavoie.redisproxy.core.cache;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,7 +18,7 @@ public class LocalCache<K, V>
   public LocalCache(final int capacity, final int ttlSecond)
   {
     cache = new LRUCache(capacity);
-    expiryCache = new ConcurrentHashMap<>(capacity);
+    expiryCache = new HashMap<>(capacity);
     ttl = ttlSecond;
   }
 

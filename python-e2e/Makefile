@@ -11,6 +11,7 @@ run:
  	-e SERVICE_TCP_PORT=${proxy_service_tcp_port} \
  	-e SERVICE_CACHE_SIZE=${proxy_service_cache_size} \
  	-e SERVICE_CACHE_TTL=${proxy_service_cache_ttl} \
+ 	-e SERVICE_MAX_REQUESTS=${proxy_service_max_concurrent_requests} \
  	-e REDIS_SERVICE_NAME=${redis_service_name} \
     -e REDIS_SERVICE_PORT=${redis_service_port} \
  	 ${E2E_IMAGE}:${TAG}

@@ -35,10 +35,6 @@ public class ProxyController
     return proxyService.get(key)
         .map(result -> ResponseEntity.ok(result))
         .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()))
-        /* I'm not sure entirely sure this works like I thought it would.
-           I can easily test it with junit by forcing the `tryAcquire` to fail
-           but I wasn't able to trigger during normal operaiton, even with a limit of 1 request
-         */
         .transformDeferred(BulkheadOperator.of(bulkhead))
         .onErrorResume(err ->
         {
