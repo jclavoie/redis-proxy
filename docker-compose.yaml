@@ -6,14 +6,15 @@ services:
     depends_on:
       - "redis"
     ports:
-      - "8080:8080"
+      - "18080:8080"
+      - "16379:6379"
     networks:
       - my-network
     environment:
       - LOCAL_CACHE_SIZE=${cache_size}
       - LOCAL_CACHE_TTL_SECONDS=${cache_ttl}
       - MAX_CONCURRENT_REQUESTS=${max_concurrent_requests}
-      - TCP_SERVER_HOSTNAME=${tcp_server_hostname}
+      - TCP_SERVER_HOSTNAME=0.0.0.0
       - TCP_SERVER_PORT=${tcp_server_port}
 
   redis:

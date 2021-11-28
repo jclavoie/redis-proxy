@@ -43,9 +43,14 @@ spring:
   redis:
     database: 0
     host: "127.0.0.1"
-    port: "16379"
+    port: "6379"
     timeout: 60000
 
+application:
+  redis-proxy:
+    tcp:
+      hostname: "localhost"
+      port: 36379
 ---
 spring:
   config.activate.on-profile: compose

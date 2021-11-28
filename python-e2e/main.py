@@ -1,5 +1,6 @@
 import argparse
 import os
+import uuid
 from collections import OrderedDict
 from time import sleep
 
@@ -9,7 +10,9 @@ import requests_threads
 
 async_session: requests_threads.AsyncSession
 redis_write: redis.Redis
+redis_read: redis.Redis
 config = None
+service_http_url: str
 
 
 def _fill_redis(size):
@@ -29,7 +32,7 @@ def _empty_redis():
 async def _get_value_from_http_parallel(keys: OrderedDict):
     rs = {}
     for key, _ in keys.items():
-        rs[key] = await async_session.get(config.service_url + '/cache/' + key)
+        rs[key] = await async_session.get(service_http_url + '/cache/' + key)
     return rs
 
 
@@ -87,23 +90,48 @@ async def test_wait_for_ttl_then_cache_empty(entries: OrderedDict, ttl):
     return result
 
 
+def test_get_from_redis_tcp_proxy():
+    print("### Testing cache using REDIS-PROXY TCP ###")
+    key = str(uuid.uuid4())
+    value = str(uuid.uuid4())
+    redis_write.set(key, value)
+    value_from_cache = redis_read.get(key).decode('utf-8')
+    if value_from_cache != value:
+        print("Expected %s but got %s" % (value, value_from_cache))
+        return False
+    redis_write.delete(key)
+    value_from_cache_after_delete = redis_read.get(key).decode('utf-8')
+    if value_from_cache_after_delete != value:
+        print("Expected %s but got %s" % (value, value_from_cache_after_delete))
+        return False
+    print("### TEST RESULT : True")
+    return True
+
+
 def __init__():
-    global config, redis_write, async_session
+    global config, redis_write, redis_read, async_session, service_http_url
     parser = argparse.ArgumentParser()
-    parser.add_argument('--service-url',
-                        default=os.environ.get('SERVICE_URL', "http://localhost:8080"))
+    parser.add_argument('--service-name',
+                        default=os.environ.get('SERVICE_NAME', "localhost"))
+    parser.add_argument('--service-port',
+                        default=os.environ.get('SERVICE_PORT', 18080))
+    parser.add_argument('--service-tcp-port',
+                        default=os.environ.get('SERVICE_TCP_PORT', 16379))
     parser.add_argument('--redis-host',
                         default=os.environ.get('REDIS_HOST', "localhost"))
     parser.add_argument('--redis-port',
-                        default=os.environ.get('REDIS_PORT', "6379"))
+                        default=os.environ.get('REDIS_PORT', 6379))
     parser.add_argument('--service-cache-size',
                         default=os.environ.get('SERVICE_CACHE_SIZE', 20))
     parser.add_argument('--service-cache-ttl',
-                        default=os.environ.get('SERVICE_CACHE_TTL', 10))
+                        default=os.environ.get('SERVICE_CACHE_TTL', 5))
 
     config = parser.parse_args()
     print(config)
+    service_http_url = "http://" + config.service_name + ":" + str(config.service_port)
     redis_write = redis.Redis(host=config.redis_host, port=config.redis_port, db=0)
+    print(config.service_name, config.service_tcp_port)
+    redis_read = redis.Redis(host=config.service_name, port=config.service_tcp_port)
     async_session = requests_threads.AsyncSession(int(config.service_cache_size))
 
 
@@ -111,7 +139,7 @@ def _wait_for_service_ready():
     success = False
     while not success:
         try:
-            resp = requests.get(config.service_url + '/health')
+            resp = requests.get(service_http_url + '/health')
             if resp.status_code == 200:
                 success = True
             else:
@@ -132,6 +160,9 @@ async def main():
         print("Test Failed!")
         exit(-1)
     if not await test_wait_for_ttl_then_cache_empty(entries, int(config.service_cache_ttl)):
+        print("Test Failed!")
+        exit(-1)
+    if not test_get_from_redis_tcp_proxy():
         print("Test Failed!")
         exit(-1)
     exit(0)

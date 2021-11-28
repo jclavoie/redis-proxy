@@ -6,7 +6,7 @@ ARG TAG
 RUN echo ${TAG}
 COPY src /home/app/src
 COPY pom.xml /home/app
-RUN mvn -f /home/app/pom.xml clean package -Drevision=${TAG}
+RUN mvn -f /home/app/pom.xml package -Drevision=${TAG}
 
 #
 # Package
@@ -15,7 +15,6 @@ FROM eclipse-temurin:17-alpine
 ARG TAG
 COPY --from=builder /home/app/target/redis-proxy-${TAG}.jar app.jar
 COPY docker-entrypoint.sh /usr/local/bin/
-EXPOSE 8080
 
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh && ln -s /usr/local/bin/docker-entrypoint.sh /
 ENTRYPOINT ["sh", "docker-entrypoint.sh"]
