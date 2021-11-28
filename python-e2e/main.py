@@ -91,7 +91,7 @@ async def test_wait_for_ttl_then_cache_empty(entries: OrderedDict, ttl):
 
 
 def test_get_from_redis_tcp_proxy():
-    print("### Testing cache using REDIS TCP ###")
+    print("### Testing cache using REDIS-PROXY TCP ###")
     key = str(uuid.uuid4())
     value = str(uuid.uuid4())
     redis_write.set(key, value)

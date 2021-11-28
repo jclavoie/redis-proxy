@@ -18,4 +18,5 @@
 * Rework E2E do make http requests in parallel : 30m
 * Implement concurrent request limiter. 2h but I spent most of time trying to trigger the error by
   the E2E, which I wasn't able to
-* Implement simple REDIS protocol on TCP : 2h
+* Implement simple REDIS protocol on TCP: 1h30
+* Figuring out that a docker container needs to listen to 0.0.0.0 and not localhost : a few hours
